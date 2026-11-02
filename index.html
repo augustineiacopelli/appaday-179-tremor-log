@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tremor Log | AppADay 179</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="apple-touch-icon" href="https://augustineiacopelli.github.io/appaday/icons/179.png">
+<meta name="apple-mobile-web-app-title" content="Tremor Log">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="manifest" href="https://augustineiacopelli.github.io/appaday/manifests/179.webmanifest">
+<script src="https://augustineiacopelli.github.io/appaday/save.js" defer></script>
+<style>
+:root{--bg:#111317;--surf:#1B1E24;--text:#ECEEF2;--mut:#A3A9B5;--acc:#5B4BC4;--acct:#A89CF0;--line:#2C313A;
+--l0:#6B7280;--l1:#3FA7D6;--l2:#3DBE8B;--l3:#E6C229;--l4:#F08A24;--l5:#EF5A5F}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);overscroll-behavior:none}
+body{margin:0;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.4}
+a{color:var(--acct)}
+button,select{font:inherit;color:inherit}
+.hdr{background:var(--surf);border-bottom:1px solid var(--line);padding:8px 10px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:8px}
+.badge{background:var(--acc);color:#fff;font-weight:700;border-radius:8px;padding:3px 8px;font-size:14px;letter-spacing:.5px}
+.name{font-weight:700;font-size:17px;white-space:nowrap}
+.back{font-size:13px;margin-left:4px;white-space:nowrap}
+.grow{flex:1}
+.btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:#252932;cursor:pointer}
+.btn:hover{background:#2C313A}
+.btn.acc{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn.icon{width:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.btn[disabled]{opacity:.45;cursor:default}
+main{flex:1 1 0;min-height:0;overflow-y:auto;width:100%;max-width:760px;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;color:var(--mut)}
+.chip.on{color:var(--acct)}
+.msg{font-size:14px;color:var(--mut)}
+.msg.warn{color:#F5C46B}
+#start{width:100%;min-height:56px;font-size:18px;font-weight:700}
+.cal{height:10px;border-radius:6px;background:var(--bg);border:1px solid var(--line);overflow:hidden;margin-top:8px}
+.cal i{display:block;height:100%;width:0;background:var(--acc);transition:width .1s linear}
+.lvlname{font-size:clamp(28px,9vw,40px);font-weight:800;line-height:1.05}
+.lvlsub{color:var(--mut);font-size:14px;margin-top:2px;min-height:40px}
+.scale{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:10px 0 4px;position:relative}
+.seg{height:22px;border-radius:6px;background:var(--bg);border:1px solid var(--line);position:relative;overflow:hidden}
+.seg i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--c)}
+.seg.pk{outline:2px solid var(--c);outline-offset:1px}
+.names{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;font-size:11px;color:var(--mut);text-align:center}
+.live{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;color:var(--mut);font-size:14px;margin-top:8px}
+.live b{color:var(--text)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cell{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.cell .k{font-size:12px;color:var(--mut)}
+.cell .v{font-size:clamp(17px,5.2vw,22px);font-weight:700;font-variant-numeric:tabular-nums}
+.cell .n{font-size:12px;color:var(--mut)}
+.cell.wide{grid-column:1/-1}
+canvas#trace{width:100%;height:170px;display:block;border-radius:10px;background:var(--bg);border:1px solid var(--line);touch-action:none}
+.h{font-size:13px;color:var(--mut);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1 1 40%}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.log li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--c)}
+.log .t{color:var(--mut);font-size:12px}
+.log .m{font-variant-numeric:tabular-nums;font-weight:700}
+.empty{color:var(--mut);font-size:14px}
+.set{display:none;gap:10px;flex-direction:column}
+.set.open{display:flex}
+.set label{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px}
+select{min-height:44px;background:#252932;border:1px solid var(--line);border-radius:10px;padding:0 10px}
+.note{font-size:12px;color:var(--mut)}
+footer{padding:8px 10px calc(8px + env(safe-area-inset-bottom));font-size:12px;color:var(--mut);text-align:center}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.cal i{transition:none}}
+</style>
+</head>
+<body>
+<header class="hdr" id="hdr">
+<div class="row">
+<span class="badge">179</span>
+<span class="name">Tremor Log</span>
+<a class="back" href="https://augustineiacopelli.github.io/appaday/">AppADay</a>
+<span class="grow"></span>
+<button type="button" class="btn icon" id="btn-gear" aria-label="Settings" aria-expanded="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+</div>
+</header>
+
+<main id="main">
+<section class="card set" id="settings" aria-label="Settings">
+<label>Quake distance for the magnitude estimate
+<select id="s-dist"><option value="10">10 km</option><option value="25">25 km</option><option value="50">50 km</option><option value="100">100 km</option></select></label>
+<label>Spike sensitivity
+<select id="s-sens"><option value="4">Low</option><option value="2.5" selected>Normal</option><option value="1.5">High</option></select></label>
+<label>Peak hold
+<select id="s-hold"><option value="3">3 seconds</option><option value="8" selected>8 seconds</option><option value="20">20 seconds</option></select></label>
+<div class="btns"><button type="button" class="btn" id="btn-clear">Clear event log</button></div>
+<div class="note">Settings are saved on this device.</div>
+</section>
+
+<section class="card" id="startcard">
+<button type="button" class="btn acc" id="start">Start listening</button>
+<div class="msg" id="startmsg" style="margin-top:8px">Lay your phone flat on a firm surface. Tap Start, allow motion access if asked, and keep hands off for three seconds while it calibrates.</div>
+<div class="cal" id="calwrap" hidden><i id="calbar"></i></div>
+<div class="btns" style="margin-top:8px"><button type="button" class="btn" id="btn-demo">Try demo signal</button></div>
+</section>
+
+<section class="card" id="readout" aria-live="off">
+<div class="lvlname" id="lvlname" style="color:var(--l0)">Waiting</div>
+<div class="lvlsub" id="lvlsub">Start listening to see the six level scale.</div>
+<div class="scale" id="scale"></div>
+<div class="names" id="names"></div>
+<div class="live"><span>Now <b id="nowms">0.000</b> m/s2</span><span><b id="nowg">0.0000</b> g</span><span>Peak <b id="pkms">0.000</b> m/s2</span></div>
+</section>
+
+<section class="card">
+<p class="h">Peak translated</p>
+<div class="grid">
+<div class="cell"><div class="k">Acceleration</div><div class="v" id="t-ms">0.000 m/s2</div><div class="n" id="t-g">0.0000 g</div></div>
+<div class="cell"><div class="k">Seismology units</div><div class="v" id="t-gal">0.0 gal</div><div class="n">1 gal = 1 cm/s2</div></div>
+<div class="cell"><div class="k">Mercalli intensity</div><div class="v" id="t-mmi">I</div><div class="n" id="t-mmin">Not felt</div></div>
+<div class="cell"><div class="k" id="t-mk">Richter style at 10 km</div><div class="v" id="t-mag">below M 0</div><div class="n" id="t-magn">estimate</div></div>
+<div class="cell wide"><div class="k">What it feels like</div><div class="v" id="t-feel" style="font-size:15px;font-weight:600">Nothing yet.</div></div>
+</div>
+<p class="note" style="margin:8px 0 0">A phone cannot measure true Richter magnitude, which describes the energy released at a quake source. Mercalli intensity is the honest translation of local shaking. The magnitude figure is the quake that would shake the ground this hard at the chosen distance, using the Joyner and Boore 1981 attenuation relation, extrapolated below its normal range. Treat it as a feel for scale.</p>
+</section>
+
+<section class="card">
+<p class="h">Trace, last 20 seconds (log scale)</p>
+<canvas id="trace" width="700" height="340" aria-label="Acceleration trace"></canvas>
+<div class="chips" style="margin-top:8px"><span class="chip" id="c-src">no sensor</span><span class="chip" id="c-rate">0 Hz</span><span class="chip" id="c-floor">floor not set</span></div>
+<div class="btns" style="margin-top:8px"><button type="button" class="btn" id="btn-recal" disabled>Recalibrate</button><button type="button" class="btn" id="btn-reset" disabled>Reset peak</button></div>
+</section>
+
+<section class="card">
+<p class="h">Event log</p>
+<ul class="log" id="log"></ul>
+<div class="empty" id="logempty">No spikes yet. A tap on the table will make one.</div>
+<div class="btns" style="margin-top:10px"><button type="button" class="btn" id="x-png">Save PNG</button><button type="button" class="btn" id="x-csv">Events CSV</button><button type="button" class="btn" id="x-tcsv">Trace CSV</button></div>
+<div class="note" id="xmsg" style="margin-top:6px"></div>
+</section>
+</main>
+<footer>Screen stays awake while listening. Data never leaves your device.</footer>
+
+<script>
+(function () {
+'use strict';
+var G = 9.80665, KEY = 'appaday179';
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- scale definitions ---------- */
+var LV = [
+  { n: 'Still', c: 'var(--l0)', hex: '#6B7280', lo: 0, feel: 'Nothing detectable. The surface is at rest.' },
+  { n: 'Faint', c: 'var(--l1)', hex: '#3FA7D6', lo: 0, feel: 'Traffic rumble through the floor or a step down the hall. Instruments only.' },
+  { n: 'Light', c: 'var(--l2)', hex: '#3DBE8B', lo: 0.137, feel: 'A passing truck or a door closing in the room. A hanging lamp may sway.' },
+  { n: 'Moderate', c: 'var(--l3)', hex: '#E6C229', lo: 0.382, feel: 'A heavy footstep or a washer thumping. Dishes and glasses rattle.' },
+  { n: 'Strong', c: 'var(--l4)', hex: '#F08A24', lo: 0.902, feel: 'A hard stomp, a slammed door, or the table bumped. Loose objects shift.' },
+  { n: 'Violent', c: 'var(--l5)', hex: '#EF5A5F', lo: 3.334, feel: 'A drop or a hard impact. Far beyond any everyday tremor.' }
+];
+/* Wald 1999 style PGA (percent g) to instrumental Mercalli intensity */
+var MMI = [
+  [0.17, 'I', 'Not felt'], [1.4, 'II to III', 'Weak'], [3.9, 'IV', 'Light'], [9.2, 'V', 'Moderate'],
+  [18, 'VI', 'Strong'], [34, 'VII', 'Very strong'], [65, 'VIII', 'Severe'], [124, 'IX', 'Violent'], [1e9, 'X+', 'Extreme']
+];
+function mmiOf(a) {
+  var p = a / G * 100;
+  for (var i = 0; i < MMI.length; i++) if (p < MMI[i][0]) return MMI[i];
+  return MMI[MMI.length - 1];
+}
+function levelOf(a, floor) {
+  if (a < floor) return 0;
+  if (a >= LV[5].lo) return 5;
+  if (a >= LV[4].lo) return 4;
+  if (a >= LV[3].lo) return 3;
+  if (a >= LV[2].lo) return 2;
+  return 1;
+}
+function magOf(a, km) {
+  var y = a / G;
+  if (y <= 0) return -9;
+  var r = Math.sqrt(km * km + 7.3 * 7.3);
+  return (Math.log10(y) + 1.02 + Math.log10(r) + 0.00255 * r) / 0.249;
+}
+function fmtMag(m) { return m < 0 ? 'below M 0' : 'M ' + m.toFixed(1); }
+
+/* ---------- state ---------- */
+var S = {
+  run: false, mode: null, phase: 'idle', demo: false,
+  floor: 0.03, sigma: 0.01, grav: [0, 0, 0], calN: 0, calSum: [0, 0, 0], calVals: [], calStart: 0, calMax: 0,
+  lastT: 0, rate: 0, rateN: 0, rateT: 0,
+  sta: 0, lta: 0, now: 0,
+  peak: 0, peakT: 0, peakAll: 0,
+  ev: null, evLowT: 0,
+  events: [], dist: 10, sens: 2.5, hold: 8, got: false, token: 0
+};
+var RING = 7000, rt = new Float64Array(RING), rv = new Float32Array(RING), rn = 0, rh = 0;
+var wake = null;
+
+function load() {
+  try {
+    var j = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (j && j.v === 1) {
+      S.events = Array.isArray(j.events) ? j.events.slice(0, 200) : [];
+      if (j.dist) S.dist = +j.dist; if (j.sens) S.sens = +j.sens; if (j.hold) S.hold = +j.hold;
+    }
+  } catch (e) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify({ v: 1, events: S.events, dist: S.dist, sens: S.sens, hold: S.hold })); } catch (e) {}
+}
+
+/* ---------- ui build ---------- */
+var segEls = [];
+(function build() {
+  var sc = $('scale'), nm = $('names');
+  LV.forEach(function (l, i) {
+    var s = document.createElement('div'); s.className = 'seg'; s.style.setProperty('--c', l.c);
+    s.innerHTML = '<i></i>'; sc.appendChild(s); segEls.push(s);
+    var n = document.createElement('div'); n.textContent = l.n; nm.appendChild(n);
+  });
+})();
+
+function setMsg(txt, warn) { var m = $('startmsg'); m.textContent = txt; m.className = 'msg' + (warn ? ' warn' : ''); }
+
+/* ---------- wake lock ---------- */
+function reqWake() {
+  if (!('wakeLock' in navigator) || wake) return;
+  try {
+    navigator.wakeLock.request('screen').then(function (l) {
+      wake = l; l.addEventListener('release', function () { wake = null; });
+    }).catch(function () {});
+  } catch (e) {}
+}
+document.addEventListener('visibilitychange', function () {
+  if (document.visibilityState === 'visible' && S.run) reqWake();
+});
+
+/* ---------- sensor start ---------- */
+function onMotion(e) {
+  var t = performance.now();
+  var a = e.acceleration, ag = e.accelerationIncludingGravity;
+  var lin = a && a.x != null && a.y != null && a.z != null;
+  if (S.mode === null) S.mode = lin ? 'lin' : (ag && ag.x != null ? 'grav' : null);
+  if (S.mode === null) return;
+  S.got = true;
+  var v;
+  if (S.mode === 'lin') v = [a.x, a.y, a.z];
+  else if (ag && ag.x != null) v = [ag.x, ag.y, ag.z];
+  else return;
+  sample(v, t);
+}
+
+function sample(v, t) {
+  if (S.lastT) {
+    var dt = t - S.lastT;
+    S.rateN++; if (t - S.rateT > 1000) { S.rate = S.rateN * 1000 / (t - S.rateT); S.rateN = 0; S.rateT = t; }
+    if (dt <= 0) return;
+  } else { S.rateT = t; }
+  var dts = S.lastT ? (t - S.lastT) / 1000 : 0.016;
+  S.lastT = t;
+  if (S.phase === 'cal') { calSample(v, t); return; }
+  if (S.phase !== 'run') return;
+  var d;
+  if (S.mode === 'lin') d = v;
+  else {
+    var q = Math.sqrt(Math.pow(v[0] - S.grav[0], 2) + Math.pow(v[1] - S.grav[1], 2) + Math.pow(v[2] - S.grav[2], 2));
+    if (!S.ev && q < Math.max(S.floor * 3, 0.12)) {
+      var al = Math.exp(-dts / 2);
+      for (var i = 0; i < 3; i++) S.grav[i] = S.grav[i] * al + v[i] * (1 - al);
+    } else if (!S.ev) {
+      var al2 = Math.exp(-dts / 20);
+      for (var k = 0; k < 3; k++) S.grav[k] = S.grav[k] * al2 + v[k] * (1 - al2);
+    }
+    d = [v[0] - S.grav[0], v[1] - S.grav[1], v[2] - S.grav[2]];
+  }
+  ingest(Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]), t, dts);
+}
+
+function calSample(v, t) {
+  if (S.mode === 'grav') { for (var i = 0; i < 3; i++) S.calSum[i] += v[i]; }
+  S.calN++;
+  S.calVals.push(v.slice());
+  var f = (t - S.calStart) / 3000;
+  $('calbar').style.width = Math.min(100, Math.round(f * 100)) + '%';
+  if (f >= 1) finishCal();
+}
+
+function finishCal() {
+  var n = S.calN || 1, i;
+  if (S.mode === 'grav') for (i = 0; i < 3; i++) S.grav[i] = S.calSum[i] / n;
+  var mags = S.calVals.map(function (v) {
+    var d = S.mode === 'grav' ? [v[0] - S.grav[0], v[1] - S.grav[1], v[2] - S.grav[2]] : v;
+    return Math.sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+  });
+  var mean = 0; mags.forEach(function (m) { mean += m; }); mean /= mags.length;
+  var sd = 0; mags.forEach(function (m) { sd += (m - mean) * (m - mean); }); sd = Math.sqrt(sd / mags.length);
+  var mx = Math.max.apply(null, mags);
+  if (mx > 0.5) {
+    setMsg('That was too much movement to calibrate. Set the phone down and keep hands off.', true);
+    startCal(); return;
+  }
+  S.sigma = sd; S.floor = Math.max(0.03, mean + 4 * sd);
+  S.phase = 'run'; S.sta = 0; S.lta = mean; S.ev = null; S.lastT = 0;
+  $('calwrap').hidden = true; $('btn-recal').disabled = false; $('btn-reset').disabled = false;
+  $('start').textContent = 'Stop listening'; $('start').disabled = false;
+  setMsg('Listening. Tap the table, walk past, or shake the phone to log a spike.');
+  $('c-floor').textContent = 'floor ' + S.floor.toFixed(3) + ' m/s2'; $('c-floor').className = 'chip on';
+  $('c-src').textContent = S.demo ? 'demo signal' : (S.mode === 'lin' ? 'gravity free sensor' : 'gravity removed in code');
+  $('c-src').className = 'chip on';
+}
+
+function startCal() {
+  S.phase = 'cal'; S.calN = 0; S.calSum = [0, 0, 0]; S.calVals = []; S.calStart = performance.now(); S.lastT = 0;
+  $('calwrap').hidden = false; $('calbar').style.width = '0%';
+  if (!S.demo) setMsg('Calibrating. Keep the phone still on a firm surface.');
+}
+
+function attach() {
+  window.addEventListener('devicemotion', onMotion);
+  S.run = true; reqWake();
+}
+
+function begin() {
+  S.demo = false; S.mode = null; S.got = false; var tok = ++S.token;
+  $('start').disabled = true;
+  var go = function () {
+    attach(); startCal(); $('start').disabled = false; $('start').textContent = 'Stop listening';
+    setTimeout(function () {
+      if (tok === S.token && !S.got && !S.demo) {
+        stop();
+        setMsg('No motion data arrived. Open this on a phone over HTTPS, or try the demo signal.', true);
+      }
+    }, 1800);
+  };
+  if (typeof window.DeviceMotionEvent === 'undefined') {
+    $('start').disabled = false;
+    setMsg('This browser has no motion sensors. Try the demo signal, or open it on a phone.', true);
+    return;
+  }
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      DeviceMotionEvent.requestPermission().then(function (r) {
+        if (r === 'granted') go();
+        else { $('start').disabled = false; setMsg('Motion access was denied. Allow it in Safari settings for this site, or try the demo signal.', true); }
+      }).catch(function () { $('start').disabled = false; setMsg('Motion permission failed. Try the demo signal.', true); });
+    } catch (e) { $('start').disabled = false; setMsg('Motion permission failed. Try the demo signal.', true); }
+  } else go();
+}
+
+function stop() {
+  S.token++;
+  window.removeEventListener('devicemotion', onMotion);
+  if (demoTimer) { clearInterval(demoTimer); demoTimer = null; }
+  if (S.ev) endEvent(performance.now(), true);
+  S.run = false; S.phase = 'idle'; S.demo = false; S.mode = null; S.lastT = 0;
+  if (wake) { try { wake.release(); } catch (e) {} wake = null; }
+  $('calwrap').hidden = true; $('start').textContent = 'Start listening'; $('start').disabled = false;
+  $('btn-recal').disabled = true; $('btn-reset').disabled = true;
+  $('c-src').textContent = 'no sensor'; $('c-src').className = 'chip'; S.rate = 0;
+}
+
+/* ---------- demo signal ---------- */
+var demoTimer = null;
+function startDemo() {
+  if (S.run) stop();
+  S.demo = true; S.mode = 'lin'; S.run = true; S.token++;
+  startCal();
+  var burst = null, next = performance.now() + 4000;
+  demoTimer = setInterval(function () {
+    var t = performance.now();
+    var a = [(Math.random() - .5) * 0.012, (Math.random() - .5) * 0.012, (Math.random() - .5) * 0.012];
+    if (S.phase === 'run') {
+      if (!burst && t > next) { burst = { t0: t, amp: Math.pow(10, -0.9 + Math.random() * 2.2), f: 4 + Math.random() * 6 }; next = t + 3500 + Math.random() * 4000; }
+      if (burst) {
+        var el = (t - burst.t0) / 1000, env = Math.exp(-el * 3.2), w = Math.sin(2 * Math.PI * burst.f * el) * burst.amp * env;
+        a[0] += w; a[1] += w * .4; a[2] += w * .6;
+        if (el > 2) burst = null;
+      }
+    }
+    sample(a, t);
+  }, 16);
+  $('start').textContent = 'Stop listening';
+  setMsg('Demo signal: random synthetic taps. No sensor is used.');
+  $('btn-recal').disabled = false; $('btn-reset').disabled = false;
+}
+
+/* ---------- processing ---------- */
+function ingest(a, t, dts) {
+  S.now = a;
+  var ks = 1 - Math.exp(-dts / 0.1), kl = 1 - Math.exp(-dts / 5);
+  S.sta += (a - S.sta) * ks;
+  if (!S.ev) S.lta += (a - S.lta) * kl;
+  rt[rh] = t; rv[rh] = a; rh = (rh + 1) % RING; if (rn < RING) rn++;
+  if (a >= S.peak) { S.peak = a; S.peakT = t; }
+  else if (t - S.peakT > S.hold * 1000) { S.peak = Math.max(S.sta, S.peak * 0.96); }
+  if (a > S.peakAll) S.peakAll = a;
+  var trig = S.floor * S.sens;
+  if (!S.ev) {
+    if (S.sta > trig && S.sta > 3 * S.lta) {
+      S.ev = { t0: t, wall: Date.now(), peak: a }; S.evLowT = 0;
+    }
+  } else {
+    if (a > S.ev.peak) S.ev.peak = a;
+    if (S.sta < trig * 0.6) {
+      if (!S.evLowT) S.evLowT = t;
+      if (t - S.evLowT > 400) endEvent(S.evLowT, false);
+    } else S.evLowT = 0;
+  }
+}
+
+function endEvent(tEnd, forced) {
+  var e = S.ev; S.ev = null; S.evLowT = 0;
+  if (!e) return;
+  var lvl = levelOf(e.peak, S.floor);
+  if (lvl === 0) return;
+  var mm = mmiOf(e.peak);
+  S.events.unshift({ ts: e.wall, a: +e.peak.toFixed(4), ms: Math.max(50, Math.round(tEnd - e.t0)), lv: lvl, mmi: mm[1] });
+  if (S.events.length > 200) S.events.length = 200;
+  save(); renderLog();
+}
+
+/* ---------- render ---------- */
+function fmtTime(ts) {
+  var d = new Date(ts);
+  var h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+  return (d.getMonth() + 1) + '/' + d.getDate() + ' ' + (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+function renderLog() {
+  var ul = $('log'); ul.innerHTML = '';
+  $('logempty').hidden = S.events.length > 0;
+  S.events.slice(0, 40).forEach(function (e) {
+    var li = document.createElement('li'); li.style.setProperty('--c', LV[e.lv].hex);
+    var mag = magOf(e.a, S.dist);
+    li.innerHTML = '<span class="dot"></span><div><span class="m">' + LV[e.lv].n + '</span> <span class="t">MMI ' + e.mmi + '</span><div class="t">' + fmtTime(e.ts) + ' for ' + (e.ms / 1000).toFixed(2) + ' s</div></div><div style="text-align:right"><span class="m">' + e.a.toFixed(3) + '</span> <span class="t">m/s2</span><div class="t">' + (e.a / G).toFixed(4) + ' g, ' + fmtMag(mag) + '</div></div>';
+    ul.appendChild(li);
+  });
+}
+
+function renderTop() {
+  var live = S.sta, pk = S.peak, lvPk = levelOf(pk, S.floor), lvLive = levelOf(live, S.floor);
+  var run = S.phase === 'run';
+  $('lvlname').textContent = run ? LV[lvPk].n : (S.phase === 'cal' ? 'Calibrating' : 'Waiting');
+  $('lvlname').style.color = run ? LV[lvPk].c : 'var(--l0)';
+  $('lvlsub').textContent = run ? LV[lvPk].feel : (S.phase === 'cal' ? 'Measuring the sensor noise floor.' : 'Start listening to see the six level scale.');
+  segEls.forEach(function (s, i) {
+    var lo = i === 1 ? S.floor : LV[i].lo, hi = i < 5 ? LV[i + 1].lo : LV[5].lo * 3, f = 0;
+    if (run) {
+      if (i < lvLive || i === 0) f = 1;
+      else if (i === lvLive) f = Math.max(0.08, Math.min(1, (live - lo) / (hi - lo)));
+    }
+    s.firstChild.style.width = (f * 100) + '%';
+    s.classList.toggle('pk', run && i === lvPk);
+  });
+  $('nowms').textContent = (run ? live : 0).toFixed(3);
+  $('nowg').textContent = (run ? live / G : 0).toFixed(4);
+  $('pkms').textContent = (run ? pk : 0).toFixed(3);
+  var shown = run ? pk : 0, mm = mmiOf(shown), mg = magOf(shown, S.dist);
+  $('t-ms').textContent = shown.toFixed(3) + ' m/s2';
+  $('t-g').textContent = (shown / G).toFixed(4) + ' g, ' + (shown / G * 100).toFixed(2) + ' percent g';
+  $('t-gal').textContent = (shown * 100).toFixed(1) + ' gal';
+  $('t-mmi').textContent = mm[1]; $('t-mmin').textContent = mm[2];
+  $('t-mk').textContent = 'Richter style at ' + S.dist + ' km';
+  $('t-mag').textContent = shown > 0 ? fmtMag(mg) : 'below M 0';
+  $('t-magn').textContent = mg < 5 && shown > 0 ? 'extrapolated estimate' : 'estimate';
+  $('t-feel').textContent = run ? LV[lvPk].feel : 'Nothing yet.';
+  $('c-rate').textContent = Math.round(S.rate) + ' Hz';
+}
+
+var cv = $('trace'), cx = cv.getContext('2d');
+var YMIN = Math.log10(0.003), YMAX = Math.log10(30);
+function yOf(a, h) { var l = Math.log10(Math.max(a, 0.003)); return h - ((l - YMIN) / (YMAX - YMIN)) * h; }
+function drawTrace(ctx, w, h, secs) {
+  ctx.fillStyle = '#111317'; ctx.fillRect(0, 0, w, h);
+  var lines = [[S.floor, '#6B7280'], [LV[2].lo, LV[2].hex], [LV[3].lo, LV[3].hex], [LV[4].lo, LV[4].hex], [LV[5].lo, LV[5].hex]];
+  ctx.font = Math.round(h / 16) + 'px system-ui,sans-serif'; ctx.textBaseline = 'bottom';
+  lines.forEach(function (l, i) {
+    var y = yOf(l[0], h); ctx.strokeStyle = l[1]; ctx.globalAlpha = .45; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); ctx.globalAlpha = .9; ctx.fillStyle = l[1];
+    ctx.fillText(LV[i + 1].n, 4, y - 2);
+  });
+  ctx.globalAlpha = 1;
+  if (!rn) return;
+  var now = rt[(rh - 1 + RING) % RING], span = secs * 1000, cols = w, mx = new Float32Array(cols);
+  for (var k = 0; k < rn; k++) {
+    var idx = (rh - 1 - k + RING * 2) % RING, age = now - rt[idx];
+    if (age > span) break;
+    var c = cols - 1 - Math.floor(age / span * cols); if (c >= 0 && rv[idx] > mx[c]) mx[c] = rv[idx];
+  }
+  ctx.lineWidth = Math.max(1.5, w / 400); ctx.lineJoin = 'round';
+  var prev = null;
+  for (var x = 0; x < cols; x++) {
+    if (!mx[x]) { prev = null; continue; }
+    var y2 = yOf(mx[x], h), lv = levelOf(mx[x], S.floor);
+    ctx.strokeStyle = LV[lv].hex;
+    if (prev) { ctx.beginPath(); ctx.moveTo(x - 1, prev); ctx.lineTo(x, y2); ctx.stroke(); }
+    prev = y2;
+  }
+  if (S.peak > 0) {
+    var yp = yOf(S.peak, h); ctx.setLineDash([6, 4]); ctx.strokeStyle = '#ECEEF2'; ctx.globalAlpha = .8;
+    ctx.beginPath(); ctx.moveTo(0, yp); ctx.lineTo(w, yp); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1;
+  }
+}
+function frame() {
+  var r = cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(r.width * dpr), h = Math.round(r.height * dpr);
+  if (w > 0 && (cv.width !== w || cv.height !== h)) { cv.width = w; cv.height = h; }
+  drawTrace(cx, cv.width, cv.height, 20);
+  renderTop();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- exports ---------- */
+function say(m) { $('xmsg').textContent = m; }
+function download(blob, name) {
+  try {
+    var f = new File([blob], name, { type: blob.type });
+    if (navigator.canShare && navigator.canShare({ files: [f] }) && /iPhone|iPad|Android/i.test(navigator.userAgent)) {
+      navigator.share({ files: [f], title: name }).then(function () { say('Shared ' + name); }).catch(function () {});
+      return;
+    }
+  } catch (e) {}
+  var u = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+  say('Saved ' + name);
+}
+function stamp() { var d = new Date(); function p(n) { return (n < 10 ? '0' : '') + n; } return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()); }
+function csvEvents() {
+  var rows = ['timestamp,level,level_name,peak_ms2,peak_g,peak_gal,mercalli,richter_style_at_' + S.dist + 'km,duration_ms'];
+  S.events.forEach(function (e) {
+    rows.push([new Date(e.ts).toISOString(), e.lv, LV[e.lv].n, e.a.toFixed(4), (e.a / G).toFixed(5), (e.a * 100).toFixed(2), '"' + e.mmi + '"', magOf(e.a, S.dist).toFixed(2), e.ms].join(','));
+  });
+  return rows.join('\n') + '\n';
+}
+function csvTrace() {
+  var rows = ['seconds_ago,peak_ms2'];
+  if (rn) {
+    var now = rt[(rh - 1 + RING) % RING], bins = {};
+    for (var k = 0; k < rn; k++) {
+      var idx = (rh - 1 - k + RING * 2) % RING, age = now - rt[idx];
+      if (age > 60000) break;
+      var b = Math.floor(age / 50); if (!(b in bins) || rv[idx] > bins[b]) bins[b] = rv[idx];
+    }
+    Object.keys(bins).map(Number).sort(function (a, b) { return b - a; }).forEach(function (b) { rows.push((b * 0.05).toFixed(2) + ',' + bins[b].toFixed(4)); });
+  }
+  return rows.join('\n') + '\n';
+}
+function exportPng() {
+  var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; var g = c.getContext('2d');
+  g.fillStyle = '#111317'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#5B4BC4'; g.fillRect(0, 0, W, 10);
+  g.fillStyle = '#ECEEF2'; g.font = '700 54px system-ui,sans-serif'; g.textBaseline = 'top'; g.fillText('Tremor Log', 50, 50);
+  g.fillStyle = '#A3A9B5'; g.font = '30px system-ui,sans-serif'; g.fillText(new Date().toLocaleString(), 50, 118);
+  var shown = S.peakAll > 0 ? S.peakAll : S.peak, lv = levelOf(shown, S.floor), mm = mmiOf(shown);
+  g.fillStyle = LV[lv].hex; g.font = '800 96px system-ui,sans-serif'; g.fillText(LV[lv].n, 50, 190);
+  g.fillStyle = '#ECEEF2'; g.font = '34px system-ui,sans-serif';
+  g.fillText('Session peak ' + shown.toFixed(3) + ' m/s2  |  ' + (shown / G).toFixed(4) + ' g  |  ' + (shown * 100).toFixed(1) + ' gal', 50, 320);
+  g.fillText('Mercalli ' + mm[1] + ' (' + mm[2] + ')  |  Richter style ' + fmtMag(magOf(shown, S.dist)) + ' at ' + S.dist + ' km', 50, 372);
+  g.fillStyle = '#A3A9B5'; g.font = '26px system-ui,sans-serif'; g.fillText(LV[lv].feel, 50, 428, W - 100);
+  var tc = document.createElement('canvas'); tc.width = W - 100; tc.height = 420; drawTrace(tc.getContext('2d'), tc.width, tc.height, 20);
+  g.drawImage(tc, 50, 490);
+  g.fillStyle = '#A3A9B5'; g.font = '24px system-ui,sans-serif'; g.fillText('Last 20 seconds, log scale', 50, 920);
+  g.fillStyle = '#ECEEF2'; g.font = '700 32px system-ui,sans-serif'; g.fillText('Recent events', 50, 970);
+  g.font = '28px system-ui,sans-serif';
+  if (!S.events.length) { g.fillStyle = '#A3A9B5'; g.fillText('None logged.', 50, 1020); }
+  S.events.slice(0, 7).forEach(function (e, i) {
+    var y = 1020 + i * 40; g.fillStyle = LV[e.lv].hex; g.beginPath(); g.arc(62, y + 16, 9, 0, 7); g.fill();
+    g.fillStyle = '#ECEEF2'; g.fillText(fmtTime(e.ts) + '   ' + LV[e.lv].n + '   ' + e.a.toFixed(3) + ' m/s2   MMI ' + e.mmi, 86, y);
+  });
+  g.fillStyle = '#A89CF0'; g.font = '26px system-ui,sans-serif'; g.fillText('AppADay 179 Tremor Log', 50, H - 60);
+  c.toBlob(function (b) { if (b) download(b, 'tremor-log-' + stamp() + '.png'); else say('Could not build the image.'); }, 'image/png');
+}
+
+/* ---------- wiring ---------- */
+$('start').addEventListener('click', function () { if (S.run) stop(); else begin(); });
+$('btn-demo').addEventListener('click', startDemo);
+$('btn-recal').addEventListener('click', function () { if (S.run) startCal(); });
+$('btn-reset').addEventListener('click', function () { S.peak = 0; S.peakAll = 0; });
+$('btn-gear').addEventListener('click', function () {
+  var o = $('settings').classList.toggle('open'); this.setAttribute('aria-expanded', o ? 'true' : 'false');
+});
+$('s-dist').addEventListener('change', function () { S.dist = +this.value; save(); renderLog(); });
+$('s-sens').addEventListener('change', function () { S.sens = +this.value; save(); });
+$('s-hold').addEventListener('change', function () { S.hold = +this.value; save(); });
+var armed = false;
+$('btn-clear').addEventListener('click', function () {
+  var b = this;
+  if (!armed) { armed = true; b.textContent = 'Tap again to confirm'; setTimeout(function () { armed = false; b.textContent = 'Clear event log'; }, 3000); return; }
+  armed = false; b.textContent = 'Clear event log'; S.events = []; save(); renderLog();
+});
+$('x-png').addEventListener('click', exportPng);
+$('x-csv').addEventListener('click', function () { download(new Blob([csvEvents()], { type: 'text/csv' }), 'tremor-events-' + stamp() + '.csv'); });
+$('x-tcsv').addEventListener('click', function () { download(new Blob([csvTrace()], { type: 'text/csv' }), 'tremor-trace-' + stamp() + '.csv'); });
+
+load();
+$('s-dist').value = String(S.dist); $('s-sens').value = String(S.sens); $('s-hold').value = String(S.hold);
+if (!$('s-dist').value) { S.dist = 10; $('s-dist').value = '10'; }
+if (!$('s-sens').value) { S.sens = 2.5; $('s-sens').value = '2.5'; }
+if (!$('s-hold').value) { S.hold = 8; $('s-hold').value = '8'; }
+renderLog();
+requestAnimationFrame(frame);
+window.__tremor = { S: S, sample: sample, levelOf: levelOf, mmiOf: mmiOf, magOf: magOf };
+})();
+</script>
+</body>
+</html>
